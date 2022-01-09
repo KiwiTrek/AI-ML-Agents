@@ -19,13 +19,8 @@ public class BallAgent : Agent
         {
             this.rBody.angularVelocity = Vector3.zero;
             this.rBody.velocity = Vector3.zero;
-            this.transform.localPosition = new Vector3( 0, 0.5f, 0);
+            this.transform.localPosition = new Vector3( 0, 1.0f, 0);
         }
-
-        // Move the target to a new spot
-        Target.localPosition = new Vector3(Random.value * 8 - 4,
-                                           0.5f,
-                                           Random.value * 8 - 4);
     }
 	
 	public override void CollectObservations(VectorSensor sensor)
@@ -63,8 +58,17 @@ public class BallAgent : Agent
 			EndEpisode();
 		}
 	}
-	
-	public override void Heuristic(in ActionBuffers actionsOut)
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Labyrinth")
+        {
+			Debug.Log("Collsion");
+			this.EndEpisode();
+        }
+    }
+
+    public override void Heuristic(in ActionBuffers actionsOut)
 	{
 		var continuousActionsOut = actionsOut.ContinuousActions;
 		continuousActionsOut[0] = Input.GetAxis("Horizontal");
