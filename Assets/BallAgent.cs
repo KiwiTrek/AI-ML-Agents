@@ -9,40 +9,31 @@ public class BallAgent : Agent
 {
     public Rigidbody rBody;
     public Transform Target;
-	public float forceMultiplier = 10;
-	public float time = 0.0f;
+	public float forceMultiplier = 8;
+	public GameObject ray;
 
-
-	private GameObject[] checkpoints;
-	private int checkCounter = 0;
-	private int bestCheckCounter = 0;
-	private int hit = 0;
-
+	public GameObject[] checkPoints;
+	float lolipop;
+	float timer;
 	void Start()
-    {
-		checkpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
-		checkCounter = 0;
-		bestCheckCounter = 0;
-		hit = 0;
+	{
+		checkPoints = GameObject.FindGameObjectsWithTag("Checkpoint");
 	}
-    public override void OnEpisodeBegin()
+	public override void OnEpisodeBegin()
     {
-		// If the Agent fell, zero its momentum
-		SetReward(0.0f);
+		lolipop = 0.0f;
+		timer = 0.0f;
 
-		time = 0.0f;
-
-        this.rBody.angularVelocity = Vector3.zero;
-        this.rBody.velocity = Vector3.zero;
-        this.transform.localPosition = new Vector3( -15.0f, 1.0f, -35.0f );
-
-		foreach(var g in checkpoints)
+		foreach(var c in checkPoints)
         {
-			g.SetActive(true);
+			c.SetActive(true);
         }
 
-		checkCounter = 0;
-		time = 0;
+		// If the Agent fell, zero its momentum
+        this.rBody.angularVelocity = Vector3.zero;
+        this.rBody.velocity = Vector3.zero;
+        this.transform.localPosition = new Vector3(-0.0f, 2.0f, -30.0f);
+
 	}
 	
 	public override void CollectObservations(VectorSensor sensor)
@@ -50,12 +41,19 @@ public class BallAgent : Agent
 		// Target and Agent positions
 		sensor.AddObservation(Target.localPosition);
 		sensor.AddObservation(this.transform.localPosition);
-
 		// Agent velocity
 		sensor.AddObservation(rBody.velocity.x);
 		sensor.AddObservation(rBody.velocity.z);
 	}
-	
+
+    public void FixedUpdate()
+    {
+		Vector3 position = Vector3.zero;
+		position.y -= 0.2f;
+		ray.transform.localPosition = position;
+		ray.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+	}
+
 	public override void OnActionReceived(ActionBuffers actionBuffers)
 	{
 		// Actions, size = 2
@@ -64,26 +62,15 @@ public class BallAgent : Agent
 		controlSignal.z = actionBuffers.ContinuousActions[1];
 		rBody.AddForce(controlSignal * forceMultiplier);
 
-		// Rewards
-		float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
-
-		time += Time.deltaTime;
-
-		// Reached target
-		if (distanceToTarget < 1.42f)
-		{
-			Done();
-		}
-
-        // Fell off platform
-        else if (this.transform.localPosition.y < 0)
+		// Fell off platform
+		if (this.transform.localPosition.y < 0)
         {
+			AddReward(-5.0f);
 			Done();
         }
 
-		else if (time >= 10)
+		else if (StepCount >= MaxStep)
         {
-			SetReward(-time);
 			Done();
         }
 	}
@@ -92,44 +79,38 @@ public class BallAgent : Agent
     {
 		float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
 
-		if (other.gameObject.CompareTag("Labyrinth"))
+		if (other.gameObject.CompareTag("Finish"))
         {
-			float reward = -10.0f + hit;
-			SetReward(reward);
-			hit++;
 			Done();
         }
 		else if (other.gameObject.CompareTag("Checkpoint"))
         {
-			hit = 0;
-			time = 0;
+			lolipop++;
+			timer = 0.0f;
+			SetReward(lolipop * 0.2f);
 			other.gameObject.SetActive(false);
-
-			checkCounter++;
-			float reward = 1.0f;
-			reward *= checkCounter;
-			SetReward(reward);
-
-			if (bestCheckCounter < checkCounter)
-            {
-				bestCheckCounter = checkCounter;
-            }
-
-			Debug.Log("Barrier Counter: " + checkCounter
-				+ " || High Score: " + bestCheckCounter);
         }
-    }
+		else if (other.gameObject.CompareTag("Labyrinth"))
+        {
+			timer += (Time.deltaTime * 5);
+			float rewardAdd = distanceToTarget * 0.2f;
+			AddReward(-0.5f - rewardAdd - timer);
+		}
+	}
 
 	public void Done()
     {
 		float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
 
-		if (distanceToTarget < 1.42f)
+		if (distanceToTarget < 4.5f)
 		{
-			SetReward(250.0f);
+			Debug.Log("Reached Goal!");
+			AddReward(10.0f);
 		}
 
-		Debug.Log("Distance: " + distanceToTarget);
+		Debug.Log("Current Reward: " + GetCumulativeReward());
+
+		//Debug.Log("Distance: " + distanceToTarget);
 
 		EndEpisode();
     }

@@ -1,5 +1,5 @@
 behaviors:
-  RollerBall:
+  MazeBall:
     trainer_type: ppo
     hyperparameters:
       batch_size: 10
@@ -12,12 +12,16 @@ behaviors:
       learning_rate_schedule: linear
     network_settings:
       normalize: false
-      hidden_units: 256
+      hidden_units: 128
       num_layers: 3
     reward_signals:
       extrinsic:
         gamma: 0.99
         strength: 1.0
-    max_steps: 2.0e+6
+      curiosity:
+        gamma: 0.99
+        strength: 0.03
+        encoding_size: 64
+    max_steps: 1.0e+6
     time_horizon: 64
     summary_freq: 10000
