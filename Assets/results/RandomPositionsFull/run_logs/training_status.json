@@ -1,0 +1,47 @@
+{
+    "MazeBall": {
+        "checkpoints": [
+            {
+                "steps": 499962,
+                "file_path": "results\\RandomPositionsFull\\MazeBall\\MazeBall-499962.onnx",
+                "reward": 0.6666666666666666,
+                "creation_time": 1642371238.1529663,
+                "auxillary_file_paths": [
+                    "results\\RandomPositionsFull\\MazeBall\\MazeBall-499962.pt"
+                ]
+            },
+            {
+                "steps": 999949,
+                "file_path": "results\\RandomPositionsFull\\MazeBall\\MazeBall-999949.onnx",
+                "reward": 0.9285714285714286,
+                "creation_time": 1642373865.8948429,
+                "auxillary_file_paths": [
+                    "results\\RandomPositionsFull\\MazeBall\\MazeBall-999949.pt"
+                ]
+            },
+            {
+                "steps": 1000013,
+                "file_path": "results\\RandomPositionsFull\\MazeBall\\MazeBall-1000013.onnx",
+                "reward": 0.9285714285714286,
+                "creation_time": 1642373865.9458892,
+                "auxillary_file_paths": [
+                    "results\\RandomPositionsFull\\MazeBall\\MazeBall-1000013.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1000013,
+            "file_path": "results\\RandomPositionsFull\\MazeBall.onnx",
+            "reward": 0.9285714285714286,
+            "creation_time": 1642373865.9458892,
+            "auxillary_file_paths": [
+                "results\\RandomPositionsFull\\MazeBall\\MazeBall-1000013.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.27.0",
+        "torch_version": "1.8.1+cu111"
+    }
+}
